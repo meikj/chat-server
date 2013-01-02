@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "logger.h"
 
@@ -15,28 +16,36 @@
  * Add an entry to the log. At the moment support is only present
  * for the standard output.
  */
-void log_entry(const char *message, int error_code, int level) {
+void log_entry(int level, int error_code, const char *format, ...) {
+	char buffer[BUFFER_SIZE];
+	va_list args;
+	
+	va_start(args, format);
+	vsprintf(buffer, format, args);
+	
 	switch(level) {
 		case LOGGER_DEBUG:
 			if(LOGGER_LEVEL <= LOGGER_DEBUG)
-				_print_entry("DEBUG", message, error_code);
+				_print_entry("DEBUG", buffer, error_code);
 			break;
 		case LOGGER_INFO:
 			if(LOGGER_LEVEL <= LOGGER_INFO)
-				_print_entry("INFO", message, error_code);
+				_print_entry("INFO", buffer, error_code);
 			break;
 		case LOGGER_WARNING:
 			if(LOGGER_LEVEL <= LOGGER_WARNING)
-				_print_entry("WARNING", message, error_code);
+				_print_entry("WARNING", buffer, error_code);
 			break;
 		case LOGGER_ERROR:
 			if(LOGGER_LEVEL <= LOGGER_ERROR)
-				_print_entry("ERROR", message, error_code);
+				_print_entry("ERROR", buffer, error_code);
 			break;
 		default:
-			_print_entry("MESSAGE", message, error_code);
+			_print_entry("MESSAGE", buffer, error_code);
 			break;
 	}
+	
+	va_end(args);
 }
 
 /*

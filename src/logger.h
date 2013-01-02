@@ -8,8 +8,9 @@
 	#define LOGGER_ERROR	4
 	
 	#define LOGGER_LEVEL	LOGGER_DEBUG
+	#define BUFFER_SIZE		256
 	
-	void log_entry(const char *message, int error_code, int level);
+	void log_entry(int level, int error_code, const char *format, ...);
 	void _print_entry(const char *prefix, const char *message, int error_code);
 	void _file_entry();
 	

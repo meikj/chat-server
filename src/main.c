@@ -19,17 +19,17 @@ void cleanup(int socket) {
 	if(socket != 0) {
 		// Socket needs to be closed
 		if(closesocket(socket) == SOCKET_ERROR) {
-			log_entry("closesocket() failed", WSAGetLastError(), LOGGER_ERROR);
+			log_entry(LOGGER_ERROR, WSAGetLastError(), "closesocket() failed");
 			exit(1);
 		}
 	}
 	if(WSACleanup() == SOCKET_ERROR) {
 		// WSACleanup() failed
-		log_entry("WSACleanup() failed", WSAGetLastError(), LOGGER_ERROR);
+		log_entry(LOGGER_ERROR, WSAGetLastError(), "WSACleanup() failed");
 		exit(1);
 	}
 	
-	log_entry("cleanup() succeeded", 0, LOGGER_DEBUG);
+	log_entry(LOGGER_DEBUG, 0, "cleanup() succeeded");
 }
 
 /*
@@ -54,28 +54,28 @@ int main(int argc, char *argv[]) {
 	
 	// Do some port checking
 	if(l_port == 0) {
-		log_entry("main(): invalid port specified", 0, LOGGER_ERROR);
+		log_entry(LOGGER_ERROR, 0, "main(): invalid port specified");
 		exit(1);
 	}
 	
-	printf("main(): l_port = %d\n", l_port);
+	log_entry(LOGGER_DEBUG, 0, "main(): l_port = %d", l_port);
 	
 	if(error != 0) {
 		// Some error occured with WSAStartup(), therefore we can't continue
-		log_entry("main(): WSAStartup() failed", error, LOGGER_ERROR);
+		log_entry(LOGGER_ERROR, error, "main(): WSAStartup() failed");
 		exit(1);
 	}
 	
-	log_entry("main(): WSAStartup() succeeded with WinSock 1.1", 0, LOGGER_DEBUG);
+	log_entry(LOGGER_DEBUG, 0, "main(): WSAStartup() succeeded with WinSock 1.1");
 	
 	if((l_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {		
 		// Some error occured with socket()
-		log_entry("main(): socket() failed", WSAGetLastError(), LOGGER_ERROR);
+		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): socket() failed");
 		cleanup(0); // No need to cleanup socket as it failed
 		exit(1);
 	}
 	
-	log_entry("main(): socket() succeeded", l_socket, LOGGER_DEBUG);
+	log_entry(LOGGER_DEBUG, l_socket, "main(): socket() succeeded");
 	
 	cleanup(l_socket);
 
