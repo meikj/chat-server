@@ -34,7 +34,7 @@ void cleanup(int socket, int wsa_cleanup) {
 		}
 	}
 	
-	log_entry(LOGGER_DEBUG, 0, "cleanup() succeeded");
+	log_entry(LOGGER_DEBUG, 0, "cleanup(): successfully cleaned up");
 }
 
 int init_socket() {
