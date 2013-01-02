@@ -7,6 +7,8 @@
 	#define LOGGER_WARNING	3
 	#define LOGGER_ERROR	4
 	
+	#define LOGGER_LEVEL	LOGGER_DEBUG
+	
 	void log_entry(const char *message, int error_code, int level);
 	
 #endif
