@@ -17,10 +17,10 @@
  * for the standard output.
  *
  * Params:
- *		level		= Log level (LOGGER_DEBUG, LOGGER_INFO, etc.)
- *		error_code	= Error code number, if applicable (0 for no error code)
- *		format		= Formatted string (can contain specifiers, i.e. %d, %s, etc.)
- *		...			= Relevant arguments for format specifiers
+ *	level		= Log level (LOGGER_DEBUG, LOGGER_INFO, etc.)
+ *	error_code	= Error code number, if applicable (0 for no error code)
+ *	format		= Formatted string (can contain specifiers, i.e. %d, %s, etc.)
+ *	... 		= Relevant arguments for format specifiers
  */
 void log_entry(int level, int error_code, const char *format, ...) {
 	char buffer[BUFFER_SIZE];

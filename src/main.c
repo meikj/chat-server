@@ -16,8 +16,8 @@
  * Used to clean up socket(s) and/or invoke WSACleanup()
  *
  * Params:
- *		socket		= Socket descriptor
- *		wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
+ *	socket		= Socket descriptor
+ *	wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
  */
 void cleanup(int socket, int wsa_cleanup) {
 	if(socket != 0) {
