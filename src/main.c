@@ -84,6 +84,8 @@ int main(int argc, char *argv[]) {
 			cleanup(l_socket, 1);
 			exit(1);
 		}
+		
+		log_entry(LOGGER_INFO, 0, "main(): accept() was successful: c_socket = %d", c_socket);
 	}
 	
 	// Perform final clean up code

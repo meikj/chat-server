@@ -48,7 +48,7 @@ void log_entry(int level, int error_code, const char *format, ...) {
 				_print_entry("ERROR", buffer, error_code);
 			break;
 		default:
-			_print_entry("MESSAGE", buffer, error_code);
+			_print_entry(NULL, buffer, 0);
 			break;
 	}
 	
@@ -68,6 +68,8 @@ void log_entry(int level, int error_code, const char *format, ...) {
 void _print_entry(const char *prefix, const char *message, int error_code) {
 	if(error_code == 0)
 		printf("[%s]: %s\n", prefix, message);
+	else if(prefix == NULL)
+		printf("%s\n", message);
 	else
 		printf("[%s]: %s: %d\n", prefix, message, error_code);
 }
