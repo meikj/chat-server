@@ -23,7 +23,7 @@ void cleanup(int socket, int wsa_cleanup) {
 	if(socket != 0) {
 		// Socket needs to be closed
 		if(closesocket(socket) == SOCKET_ERROR) {
-			log_entry(LOGGER_ERROR, WSAGetLastError(), "closesocket() failed");
+			log_entry(LOGGER_ERROR, WSAGetLastError(), "closesocket(%d) failed", socket);
 			exit(1);
 		}
 	}
