@@ -1,8 +1,20 @@
+/*
+ * main.c
+ *
+ * Chat server programmed in C. This is done with educational purposes as an
+ * aid to learn both C and network programming (at the moment Windows network
+ * programming). There is no license attached with this software.
+ *
+ */
+
 #include <stdio.h>
 #include <winsock.h>
 
 #include "logger.h"
 
+/*
+ * Used to clean up socket(s) and/or invoke WSACleanup()
+ */
 void cleanup(int socket) {
 	if(socket != 0) {
 		// Socket needs to be closed
@@ -20,10 +32,20 @@ void cleanup(int socket) {
 	log_entry("cleanup() succeeded", 0, LOGGER_DEBUG);
 }
 
-int main(void) {
+/*
+ * Program is run as follows:
+ *		<prog_name> <port_number>
+ *
+ * If arguments don't conform as such, then program will exit
+ */
+int main(int argc, char *argv[]) {
+	if(argc != 2) {
+		printf("Usage: %s <port_number>\n", argv[0]);
+		exit(1);
+	}
+		
 	WSADATA wsaData;
 	int error;
-	
 	int l_socket;
 	
 	error = WSAStartup(MAKEWORD(1, 1), &wsaData);

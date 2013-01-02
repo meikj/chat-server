@@ -2,6 +2,10 @@
 
 #include "logger.h"
 
+/*
+ * Add an entry to the log. At the moment support is only present
+ * for the standard output.
+ */
 void log_entry(const char *message, int error_code, int level) {
 	switch(level) {
 		case LOGGER_DEBUG:
