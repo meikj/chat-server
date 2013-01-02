@@ -59,9 +59,9 @@ void log_entry(int level, int error_code, const char *format, ...) {
  * internally by log_entry().
  *
  * Params:
- *		prefix		= Log output prefix (i.e. DEBUG, INFO, etc.)
- *		message		= Message to output to standard output
- *		error_code	= Error code of log, if applicable (0 for no error code)
+ *	prefix		= Log output prefix (i.e. DEBUG, INFO, etc.)
+ *	message		= Message to output to standard output
+ *	error_code	= Error code of log, if applicable (0 for no error code)
  */
 void _print_entry(const char *prefix, const char *message, int error_code) {
 	if(error_code == 0)
