@@ -5,9 +5,11 @@
  *
  */
 
+#include <stdlib.h>
 #include <winsock.h>
  
 #include "logger.h"
+#include "socket.h"
  
  /*
  * Used to clean up socket(s) and/or invoke WSACleanup()
