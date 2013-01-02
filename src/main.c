@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
 	int l_port;
 	struct sockaddr_in l_addr;
 	
+	int c_socket;
+	
 	l_socket = init_socket();
 	l_host = argv[1];
 	l_port = atoi(argv[2]);
@@ -69,6 +71,20 @@ int main(int argc, char *argv[]) {
 	
 	log_entry(LOGGER_DEBUG, 0, "main(): listen() was successful: socket = %d, backlog = %d",
 		l_socket, MAX_BACKLOG);
+		
+	// Wait for connection
+	log_entry(LOGGER_INFO, 0, "main(): waiting for connection(s)...");
+	
+	for(;;) {
+		// Main program loop
+		c_socket = accept(l_socket, NULL, NULL);
+		
+		if(c_socket == INVALID_SOCKET) {
+			log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): accept() failed");
+			cleanup(l_socket, 1);
+			exit(1);
+		}
+	}
 	
 	// Perform final clean up code
 	cleanup(l_socket, 1);
