@@ -1,0 +1,3 @@
+Chat Server
+
+This project is intended for educational purposes. It is done for myself to learn network programming in C (at the moment just Windows based, i.e. WinSock). Eventually multi-platform support will be added to further my learning.
