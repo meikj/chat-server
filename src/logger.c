@@ -2,7 +2,7 @@
 
 #include "logger.h"
 
-void log_entry(char *message, int error_code, int level) {
+void log_entry(const char *message, int error_code, int level) {
 	switch(level) {
 		case LOGGER_DEBUG:
 			printf("[DEBUG]: %s: %d\n", message, error_code);
