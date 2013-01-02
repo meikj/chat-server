@@ -14,8 +14,12 @@
 
 /*
  * Used to clean up socket(s) and/or invoke WSACleanup()
+ *
+ * Params:
+ *		socket		= Socket descriptor
+ *		wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
  */
-void cleanup(int socket) {
+void cleanup(int socket, int wsa_cleanup) {
 	if(socket != 0) {
 		// Socket needs to be closed
 		if(closesocket(socket) == SOCKET_ERROR) {
@@ -23,10 +27,12 @@ void cleanup(int socket) {
 			exit(1);
 		}
 	}
-	if(WSACleanup() == SOCKET_ERROR) {
-		// WSACleanup() failed
-		log_entry(LOGGER_ERROR, WSAGetLastError(), "WSACleanup() failed");
-		exit(1);
+	if(wsa_cleanup != 0) {
+		if(WSACleanup() == SOCKET_ERROR) {
+			// WSACleanup() failed
+			log_entry(LOGGER_ERROR, WSAGetLastError(), "WSACleanup() failed");
+			exit(1);
+		}
 	}
 	
 	log_entry(LOGGER_DEBUG, 0, "cleanup() succeeded");
