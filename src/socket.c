@@ -57,6 +57,9 @@ struct sockaddr_in init_server_addr(const char *host, int port) {
 	server.sin_addr.s_addr = inet_addr(host);
 	server.sin_port = htons(port);
 	
+	log_entry(LOGGER_DEBUG, 0, 
+		"init_server_addr(): server structure created");
+	
 	return server;
 }
 

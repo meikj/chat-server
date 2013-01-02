@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	
-	log_entry(LOGGER_DEBUG, 0, "main(): bind() was successful: address = %s, port = %i\n",
+	log_entry(LOGGER_DEBUG, 0, "main(): bind() was successful: address = %s, port = %i",
 		l_host, l_port);
 	
 	cleanup(l_socket, 1);
