@@ -50,7 +50,9 @@ int main(int argc, char *argv[]) {
 	int l_port;
 	
 	error = WSAStartup(MAKEWORD(1, 1), &wsaData);
-	l_port = argv[1];
+	l_port = atoi(argv[1]);
+	
+	printf("main(): l_port = %d\n", l_port);
 	
 	if(error != 0) {
 		// Some error occured with WSAStartup(), therefore we can't continue
