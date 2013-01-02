@@ -16,46 +16,61 @@
 
 /*
  * Program is run as follows:
- *		<prog_name> <port_number>
+ *		<prog_name> <host> <port_number>
  *
  * If arguments don't conform as such, then program will exit
  *
  */
 int main(int argc, char *argv[]) {
-	if(argc != 2) {
-		printf("Usage: %s <port_number>\n", argv[0]);
+	// Check if program conforms to argument specification
+	if(argc != 3) {
+		printf("Usage: %s <host> <port_number>\n", argv[0]);
 		exit(1);
 	}
 	
+	// Socket variables
 	int l_socket;
-	char *l_host = "127.0.0.1";
+	char *l_host;
 	int l_port;
 	struct sockaddr_in l_addr;
-	int bind_result;
 	
 	l_socket = init_socket();
-	l_port = atoi(argv[1]);
+	l_host = argv[1];
+	l_port = atoi(argv[2]);
 	
 	// Do some port checking
 	if(l_port == 0) {
 		log_entry(LOGGER_ERROR, 0, "main(): invalid port specified");
+		cleanup(l_socket, 1);
 		exit(1);
 	}
 	
+	// Output address and port for debugging purposes
 	log_entry(LOGGER_DEBUG, 0, "main(): l_host = %s", l_host);
 	log_entry(LOGGER_DEBUG, 0, "main(): l_port = %d", l_port);
 	
+	// Create address structure and bind socket
 	l_addr = init_server_addr(l_host, l_port);
-	bind_result = bind(l_socket, (struct sockaddr *)&l_addr, sizeof l_addr);
 	
-	if(bind_result == SOCKET_ERROR) {
+	if((bind(l_socket, (struct sockaddr *)&l_addr, sizeof l_addr)) == SOCKET_ERROR) {
 		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): bind() failed");
+		cleanup(l_socket, 1);
 		exit(1);
 	}
 	
 	log_entry(LOGGER_DEBUG, 0, "main(): bind() was successful: address = %s, port = %i",
 		l_host, l_port);
+		
+	if(listen(l_socket, MAX_BACKLOG) == SOCKET_ERROR) {
+		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): listen() failed");
+		cleanup(l_socket, 1);
+		exit(1);
+	}
 	
+	log_entry(LOGGER_DEBUG, 0, "main(): listen() was successful: socket = %d, backlog = %d",
+		l_socket, MAX_BACKLOG);
+	
+	// Perform final clean up code
 	cleanup(l_socket, 1);
 
 	return 0;
