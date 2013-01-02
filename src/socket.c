@@ -91,6 +91,7 @@ int init_socket() {
 			WINSOCK_MAJOR, WINSOCK_MINOR,
 			LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
 			
+		cleanup(0, 1);
 		exit(1);
 	}
 	
