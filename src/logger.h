@@ -6,6 +6,6 @@
 	#define LOGGER_WARNING	3
 	#define LOGGER_ERROR	4
 	
-	void log_entry(char *message, int level);
+	void log_entry(char *message, int error_code, int level);
 	
 #endif
