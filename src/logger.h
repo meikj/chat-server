@@ -10,5 +10,7 @@
 	#define LOGGER_LEVEL	LOGGER_DEBUG
 	
 	void log_entry(const char *message, int error_code, int level);
+	void _print_entry(const char *prefix, const char *message, int error_code);
+	void _file_entry();
 	
 #endif
