@@ -17,8 +17,7 @@ void log_entry(char *message, int error_code, int level) {
 			printf("[ERROR]: %s: %d\n", message, error_code);
 			break;
 		default:
-			printf("[WARNING]: Invalid logger level passed\n");
-			printf("%s: %d\n", message, error_code);
+			printf("[MESSAGE]: %s: %d\n", message, error_code);
 			break;
 	}
 }
