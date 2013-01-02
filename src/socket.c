@@ -17,6 +17,7 @@
  * Params:
  *	socket		= Socket descriptor
  *	wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
+ *
  */
 void cleanup(int socket, int wsa_cleanup) {
 	if(socket != 0) {
@@ -37,6 +38,35 @@ void cleanup(int socket, int wsa_cleanup) {
 	log_entry(LOGGER_DEBUG, 0, "cleanup(): successfully cleaned up");
 }
 
+/*
+ * Initialise a server socket address structure.
+ *
+ * Params:
+ *	host = Host name/IP address of computer to host on
+ *	port = Port number to host on
+ *
+ * Returns:
+ *	The newly initialised server socket address structure
+ *	that conforms to the passed arguments
+ *
+ */
+struct sockaddr_in init_server_addr(const char *host, int port) {
+	struct sockaddr_in server;
+	
+	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = inet_addr(host);
+	server.sin_port = htons(port);
+	
+	return server;
+}
+
+/*
+ * Initialise a socket descriptor that is of type TCP and IPv4
+ *
+ * Returns:
+ *	The newly initialised socket descriptor
+ *
+ */
 int init_socket() {
 	WSADATA wsaData;
 	int error;

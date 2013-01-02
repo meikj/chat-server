@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <winsock.h>
 
 #include "logger.h"
 #include "socket.h"
@@ -18,6 +19,7 @@
  *		<prog_name> <port_number>
  *
  * If arguments don't conform as such, then program will exit
+ *
  */
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
@@ -26,7 +28,10 @@ int main(int argc, char *argv[]) {
 	}
 	
 	int l_socket;
+	char *l_host = "127.0.0.1";
 	int l_port;
+	struct sockaddr_in l_addr;
+	int bind_result;
 	
 	l_socket = init_socket();
 	l_port = atoi(argv[1]);
@@ -37,7 +42,19 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	
+	log_entry(LOGGER_DEBUG, 0, "main(): l_host = %s", l_host);
 	log_entry(LOGGER_DEBUG, 0, "main(): l_port = %d", l_port);
+	
+	l_addr = init_server_addr(l_host, l_port);
+	bind_result = bind(l_socket, (struct sockaddr *)&l_addr, sizeof l_addr);
+	
+	if(bind_result == SOCKET_ERROR) {
+		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): bind() failed");
+		exit(1);
+	}
+	
+	log_entry(LOGGER_DEBUG, 0, "main(): bind() was successful: address = %s, port = %i\n",
+		l_host, l_port);
 	
 	cleanup(l_socket, 1);
 

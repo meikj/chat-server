@@ -21,6 +21,7 @@
  *	error_code	= Error code number, if applicable (0 for no error code)
  *	format		= Formatted string (can contain specifiers, i.e. %d, %s, etc.)
  *	... 		= Relevant arguments for format specifiers
+ *
  */
 void log_entry(int level, int error_code, const char *format, ...) {
 	char buffer[BUFFER_SIZE];
@@ -62,6 +63,7 @@ void log_entry(int level, int error_code, const char *format, ...) {
  *	prefix		= Log output prefix (i.e. DEBUG, INFO, etc.)
  *	message		= Message to output to standard output
  *	error_code	= Error code of log, if applicable (0 for no error code)
+ *
  */
 void _print_entry(const char *prefix, const char *message, int error_code) {
 	if(error_code == 0)
@@ -72,6 +74,7 @@ void _print_entry(const char *prefix, const char *message, int error_code) {
 
 /*
  * File logging code will go here.
+ *
  */
 void _file_entry() {
 	return;
