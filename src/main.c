@@ -52,6 +52,12 @@ int main(int argc, char *argv[]) {
 	error = WSAStartup(MAKEWORD(1, 1), &wsaData);
 	l_port = atoi(argv[1]);
 	
+	// Do some port checking
+	if(l_port == 0) {
+		log_entry("main(): invalid port specified", 0, LOGGER_ERROR);
+		exit(1);
+	}
+	
 	printf("main(): l_port = %d\n", l_port);
 	
 	if(error != 0) {
