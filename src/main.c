@@ -47,25 +47,27 @@ int main(int argc, char *argv[]) {
 	WSADATA wsaData;
 	int error;
 	int l_socket;
+	int l_port;
 	
 	error = WSAStartup(MAKEWORD(1, 1), &wsaData);
+	l_port = argv[1];
 	
 	if(error != 0) {
 		// Some error occured with WSAStartup(), therefore we can't continue
-		log_entry("WSAStartup() failed", error, LOGGER_ERROR);
+		log_entry("main(): WSAStartup() failed", error, LOGGER_ERROR);
 		exit(1);
 	}
 	
-	log_entry("WSAStartup() succeeded with WinSock 1.1", 0, LOGGER_DEBUG);
+	log_entry("main(): WSAStartup() succeeded with WinSock 1.1", 0, LOGGER_DEBUG);
 	
 	if((l_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {		
 		// Some error occured with socket()
-		log_entry("socket() failed", WSAGetLastError(), LOGGER_ERROR);
+		log_entry("main(): socket() failed", WSAGetLastError(), LOGGER_ERROR);
 		cleanup(0); // No need to cleanup socket as it failed
 		exit(1);
 	}
 	
-	log_entry("socket() succeeded", l_socket, LOGGER_DEBUG);
+	log_entry("main(): socket() succeeded", l_socket, LOGGER_DEBUG);
 	
 	cleanup(l_socket);
 
