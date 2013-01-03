@@ -66,10 +66,10 @@ void log_entry(int level, int error_code, const char *format, ...) {
  *
  */
 void _print_entry(const char *prefix, const char *message, int error_code) {
-	if(error_code == 0)
-		printf("[%s]: %s\n", prefix, message);
-	else if(prefix == NULL)
+	if(prefix == NULL)
 		printf("%s\n", message);
+	else if(error_code == 0)
+		printf("[%s]: %s\n", prefix, message);
 	else
 		printf("[%s]: %s: %d\n", prefix, message, error_code);
 }
