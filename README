@@ -1,3 +1,3 @@
 Chat Server
 
-This project is intended for educational purposes. It is done for myself to learn network programming in C (at the moment just Windows based, i.e. WinSock). Eventually multi-platform support will be added to further my learning. This is also being done to further my understanding and functioning of Git.
+This project is intended for educational purposes. It is done for myself to learn network programming in C (at the moment just Windows based, i.e. WinSock). Eventually multi-platform support will be added to further my learning. This is also being done to further my understanding and functioning of Git. At the moment, this project seems to be more of an excuse to implement my own logger, rather than show off network programming.
