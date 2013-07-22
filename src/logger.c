@@ -26,10 +26,10 @@
 void log_entry(int level, int error_code, const char *format, ...) {
 	char buffer[BUFFER_SIZE];
 	va_list args;
-	
+
 	va_start(args, format);
 	vsprintf(buffer, format, args);
-	
+
 	switch(level) {
 		case LOGGER_DEBUG:
 			if(LOGGER_LEVEL <= LOGGER_DEBUG)
@@ -51,7 +51,7 @@ void log_entry(int level, int error_code, const char *format, ...) {
 			_print_entry(NULL, buffer, 0);
 			break;
 	}
-	
+
 	va_end(args);
 }
 
