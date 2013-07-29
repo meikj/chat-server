@@ -16,7 +16,7 @@
  *
  * Params:
  *	socket		= Socket descriptor
- *	wsa_socket_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
+ *	wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
  *
  */
 void socket_cleanup(int socket, int wsa_cleanup) {
@@ -48,8 +48,7 @@ void socket_cleanup(int socket, int wsa_cleanup) {
  *	port = Port number to host on
  *
  * Returns:
- *	The newly initialised server socket address structure
- *	that conforms to the passed arguments
+ *	A socket address structure
  *
  */
 struct sockaddr_in socket_init_addr(const char *host, int port) {

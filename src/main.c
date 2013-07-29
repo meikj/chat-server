@@ -74,7 +74,7 @@ void wait_for_client(int l_socket, void(*handler)(int)) {
 }
 
 /*
- * Initialise the server
+ * Initialise the server socket.
  *
  * Params:
  *	host = The host to listen on
