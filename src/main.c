@@ -14,9 +14,9 @@
 #include "logger.h"
 #include "socket.h"
 
- #define BUFFER_LEN 512
+#define BUFFER_LEN 512
 
- /*
+/*
  * Handle an accepted client socket connection until it dies.
  *
  * Params:
