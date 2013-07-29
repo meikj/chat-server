@@ -31,7 +31,7 @@ void handle_client(int s, struct sockaddr_in addr) {
 	char buf[DEFAULT_BUF_SIZE];
 	int res;
 	socket_client c;
-	int c_pos = count;
+	int c_pos = count++;
 
 	// Populate the client structure using the socket and address details
 	c.socket = s;
