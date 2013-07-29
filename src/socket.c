@@ -6,20 +6,23 @@
  */
 
 #include <stdlib.h>
-#include <winsock.h>
 
 #include "logger.h"
 #include "socket.h"
 
+#ifdef _WIN32
+WSADATA wsaData;
+#endif
+
 /*
- * Initialises the required socket startup code, including WSAStartup().
+ * Initialises the required socket startup code.
 
  * Returns:
  *	If the function is successful 0 is returned, otherwise -1 is returned upon
  *	error.
  */
 int socket_init() {
-	WSADATA wsaData;
+	#ifdef _WIN32
 	int error;
 
 	error = WSAStartup(MAKEWORD(WINSOCK_MAJOR, WINSOCK_MINOR), &wsaData);
@@ -40,6 +43,7 @@ int socket_init() {
 		WSACleanup();
 		return -1;
 	}
+	#endif
 
 	return 0;
 }

@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <winsock.h>
 
 #include "logger.h"
 #include "socket.h"
@@ -15,6 +14,9 @@
 #define DEFAULT_HOST "127.0.0.1"
 #define DEFAULT_PORT 5000
 #define DEFAULT_BUF_SIZE 256
+
+// Basic data structure storing all connected clients
+socket_client *clients[MAX_CLIENTS];
 
 /*
  * Handle a client connection.
