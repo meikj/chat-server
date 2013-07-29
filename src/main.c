@@ -14,6 +14,8 @@
 #include "logger.h"
 #include "socket.h"
 
+#define DEFAULT_HOST 127.0.0.1
+#define DEFAULT_PORT 5000
 #define BUFFER_LEN 512
 
 /*
@@ -52,18 +54,20 @@ void handle_socket(int s) {
  *		handler		= Function pointer to the client socket handler function
  */
 void wait_for_client(int l_socket, void(*handler)(int)) {
-	int c_socket;
+	for(;;) {
+		int c_socket;
 
-	if((c_socket = accept(l_socket, NULL, NULL)) == INVALID_SOCKET) {
-		log_entry(LOGGER_ERROR, WSAGetLastError(),
-			"wait_for_client(): accept() failed");
-		cleanup(l_socket, 1);
-		exit(1);
+		if((c_socket = accept(l_socket, NULL, NULL)) == INVALID_SOCKET) {
+			log_entry(LOGGER_ERROR, WSAGetLastError(),
+				"wait_for_client(): accept() failed");
+			cleanup(l_socket, 1);
+			exit(1);
+		}
+
+		log_entry(LOGGER_INFO, 0,
+			"wait_for_client(): accept() was successful: c_socket = %d", c_socket);
+		handler(c_socket);
 	}
-
-	log_entry(LOGGER_INFO, 0,
-		"wait_for_client(): accept() was successful: c_socket = %d", c_socket);
-	handler(c_socket);
 }
 
 /*
@@ -74,23 +78,20 @@ void wait_for_client(int l_socket, void(*handler)(int)) {
  * Example usage: ./chat-server.exe 127.0.0.1 5000
  */
 int main(int argc, char *argv[]) {
-	if(argc != 3) {
-		printf("Usage: %s <host> <port_number>\n", argv[0]);
-		exit(1);
-	}
-
-	// Listen socket variables
 	int l_socket;
 	char *l_host;
 	int l_port;
 	struct sockaddr_in l_addr;
 
-	// Client socket variables
-	int c_socket;
-
 	l_socket = init_socket();
-	l_host = argv[1];
-	l_port = atoi(argv[2]);
+
+	if(argc >= 3) {
+		l_host = argv[1];
+		l_port = atoi(argv[2]);
+	} else {
+		l_host = DEFAULT_HOST;
+		l_port = DEFAULT_PORT;
+	}
 
 	// Do some primitive port checking
 	if(l_port == 0) {
