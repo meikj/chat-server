@@ -14,15 +14,42 @@
 #include "logger.h"
 #include "socket.h"
 
+ #define BUFFER_LEN 512
+
+ /*
+ * Handle an accepted client socket connection until it dies.
+ *
+ * Params:
+ *		s = Client socket descriptor
+ */
+void handle_socket(int s) {
+	char buf[BUFFER_LEN];
+	int res;
+
+	do {
+		res = recv(s, buf, BUFFER_LEN, 0);
+
+		if(res > 0) {
+			log_entry(LOGGER_INFO, 0,
+				"handle_socket(%d): recv() = %d bytes", s, res);
+		} else if(res == 0) {
+			log_entry(LOGGER_INFO, 0,
+				"handle_socket(%d): connection closed", s);
+		} else {
+			log_entry(LOGGER_ERROR, 0,
+				"handle_socket(%d): recv() failed: %d", s, WSAGetLastError());
+		}
+	} while(res > 0);
+}
+
 /*
- * Program is run as follows:
- *		<prog_name> <host> <port_number>
+ * The following arguments are accepted:
+ *		host - The host to listen on
+ *		port - The port number to listen on
  *
- * If arguments don't conform as such, then program will exit
- *
+ * Example usage: ./chat-server.exe 127.0.0.1 5000
  */
 int main(int argc, char *argv[]) {
-	// Check if program conforms to argument specification
 	if(argc != 3) {
 		printf("Usage: %s <host> <port_number>\n", argv[0]);
 		exit(1);
@@ -73,9 +100,7 @@ int main(int argc, char *argv[]) {
 	log_entry(LOGGER_DEBUG, 0, "main(): listen() was successful: socket = %d, backlog = %d",
 		l_socket, MAX_BACKLOG);
 
-	// Wait for connection
 	log_entry(LOGGER_INFO, 0, "main(): waiting for connection(s)...");
-
 	for(;;) {
 		// Main program loop
 		c_socket = accept(l_socket, NULL, NULL);
@@ -87,6 +112,8 @@ int main(int argc, char *argv[]) {
 		}
 
 		log_entry(LOGGER_INFO, 0, "main(): accept() was successful: c_socket = %d", c_socket);
+
+		handle_socket(c_socket);
 	}
 
 	// Perform final clean up code
