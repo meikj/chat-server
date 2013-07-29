@@ -1,9 +1,9 @@
 /*
  * logger.c
  *
- * Used for logging to the standard output and/or files.
- * Contains different levels of logging which can be controlled
- * by editing the logger header file.
+ * Used for logging to the standard output and/or log file.
+ * Supports different levels of logging, as well as setting a minimum log
+ * priority.
  *
  */
 
@@ -13,18 +13,16 @@
 #include "logger.h"
 
 /*
- * Add an entry to the log. At the moment support is only present
- * for the standard output.
+ * Add an entry to the log.
  *
  * Params:
  *	level		= Log level (LOGGER_DEBUG, LOGGER_INFO, etc.)
- *	error_code	= Error code number, if applicable (0 for no error code)
  *	format		= Formatted string (can contain specifiers, i.e. %d, %s, etc.)
  *	... 		= Relevant arguments for format specifiers
  *
  */
-void log_entry(int level, int error_code, const char *format, ...) {
-	char buffer[BUFFER_SIZE];
+void log_entry(int level, const char *format, ...) {
+	char buffer[LOGGER_BUF_SIZE];
 	va_list args;
 
 	va_start(args, format);
@@ -33,22 +31,22 @@ void log_entry(int level, int error_code, const char *format, ...) {
 	switch(level) {
 		case LOGGER_DEBUG:
 			if(LOGGER_LEVEL <= LOGGER_DEBUG)
-				_print_entry("DEBUG", buffer, error_code);
+				_print_entry("DEBUG", buffer);
 			break;
 		case LOGGER_INFO:
 			if(LOGGER_LEVEL <= LOGGER_INFO)
-				_print_entry("INFO", buffer, error_code);
+				_print_entry("INFO", buffer);
 			break;
 		case LOGGER_WARNING:
 			if(LOGGER_LEVEL <= LOGGER_WARNING)
-				_print_entry("WARNING", buffer, error_code);
+				_print_entry("WARNING", buffer);
 			break;
 		case LOGGER_ERROR:
 			if(LOGGER_LEVEL <= LOGGER_ERROR)
-				_print_entry("ERROR", buffer, error_code);
+				_print_entry("ERROR", buffer);
 			break;
 		default:
-			_print_entry(NULL, buffer, 0);
+			_print_entry(NULL, buffer);
 			break;
 	}
 
@@ -61,17 +59,14 @@ void log_entry(int level, int error_code, const char *format, ...) {
  *
  * Params:
  *	prefix		= Log output prefix (i.e. DEBUG, INFO, etc.)
- *	message		= Message to output to standard output
- *	error_code	= Error code of log, if applicable (0 for no error code)
+ *	message		= Log message
  *
  */
-void _print_entry(const char *prefix, const char *message, int error_code) {
+void _print_entry(const char *prefix, const char *message) {
 	if(prefix == NULL)
-		printf("%s\n", message);
-	else if(error_code == 0)
-		printf("[%s]: %s\n", prefix, message);
+		printf("%s", message);
 	else
-		printf("[%s]: %s: %d\n", prefix, message, error_code);
+		printf("[%s]: %s", prefix, message);
 }
 
 /*

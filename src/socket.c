@@ -1,7 +1,7 @@
 /*
  * socket.h
  *
- * Contains the relevant socket code for the chat server.
+ * Contains functions for socket management.
  *
  */
 
@@ -11,33 +11,37 @@
 #include "logger.h"
 #include "socket.h"
 
- /*
- * Used to clean up socket(s) and/or invoke WSACleanup()
- *
- * Params:
- *	socket		= Socket descriptor
- *	wsa_cleanup	= Invoke WSACleanup() or not (0 = false, 1 = true)
- *
+/*
+ * Initialises the required socket startup code, including WSAStartup().
+
+ * Returns:
+ *	If the function is successful 0 is returned, otherwise -1 is returned upon
+ *	error.
  */
-void socket_cleanup(int socket, int wsa_cleanup) {
-	if(socket != 0) {
-		// Socket needs to be closed
-		if(closesocket(socket) == SOCKET_ERROR) {
-			log_entry(LOGGER_ERROR, WSAGetLastError(),
-				"socket_cleanup(): closesocket(%d) failed", socket);
-			exit(1);
-		}
-	}
-	if(wsa_cleanup != 0) {
-		if(WSACleanup() == SOCKET_ERROR) {
-			// WSACleanup() failed
-			log_entry(LOGGER_ERROR, WSAGetLastError(),
-				"socket_cleanup(): WSACleanup() failed");
-			exit(1);
-		}
+int socket_init() {
+	WSADATA wsaData;
+	int error;
+
+	error = WSAStartup(MAKEWORD(WINSOCK_MAJOR, WINSOCK_MINOR), &wsaData);
+
+	if(error != 0) {
+		// Some error occured with WSAStartup(), therefore we can't continue
+		log_error("socket_init(): WSAStartup() failed: %d\n", error);
+		return -1;
 	}
 
-	log_entry(LOGGER_DEBUG, 0, "socket_cleanup(%d): success", socket);
+	// Check if WinSock version conforms to the requested version
+	if(LOBYTE(wsaData.wVersion) != WINSOCK_MAJOR || HIBYTE(wsaData.wVersion) != WINSOCK_MINOR) {
+		// Version wasn't found, therefore library isn't compatible
+		log_error("socket_init(): WinSck: requested = %d.%d, received = %d.%d",
+			WINSOCK_MAJOR, WINSOCK_MINOR,
+			LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
+
+		WSACleanup();
+		return -1;
+	}
+
+	return 0;
 }
 
 /*
@@ -48,66 +52,51 @@ void socket_cleanup(int socket, int wsa_cleanup) {
  *	port = Port number to host on
  *
  * Returns:
- *	A socket address structure
- *
+ *	The socket address structure.
  */
 struct sockaddr_in socket_init_addr(const char *host, int port) {
-	struct sockaddr_in server;
+	struct sockaddr_in addr;
 
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = inet_addr(host);
-	server.sin_port = htons(port);
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = inet_addr(host);
+	addr.sin_port = htons(port);
 
-	log_entry(LOGGER_DEBUG, 0,
-		"socket_init_addr(): server structure created");
-
-	return server;
+	return addr;
 }
 
 /*
- * Generate a socket descriptor that is of type TCP and IPv4
+ * Initialise a server socket.
+ *
+ * Params:
+ *	addr = The socket address structure
  *
  * Returns:
- *	The newly generated socket descriptor
- *
+ *	The server socket descriptor, or -1 upon error.
  */
-int socket_gen() {
-	WSADATA wsaData;
-	int error;
-	int l_socket;
+int socket_init_server(struct sockaddr_in addr) {
+	int s;
 
-	error = WSAStartup(MAKEWORD(WINSOCK_MAJOR, WINSOCK_MINOR), &wsaData);
-
-	if(error != 0) {
-		// Some error occured with WSAStartup(), therefore we can't continue
-		log_entry(LOGGER_ERROR, error, "socket_gen(): WSAStartup() failed");
-		exit(1);
-	}
-
-	// Check if WinSock version conforms to the requested version
-	if(LOBYTE(wsaData.wVersion) != WINSOCK_MAJOR || HIBYTE(wsaData.wVersion) != WINSOCK_MINOR) {
-		// Version wasn't found, therefore library isn't compatible
-		log_entry(LOGGER_ERROR, 0,
-			"socket_gen(): WinSock lib requested wasn't found: requested = %d.%d, received = %d.%d",
-			WINSOCK_MAJOR, WINSOCK_MINOR,
-			LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
-
-		socket_cleanup(0, 1);
-		exit(1);
-	}
-
-	log_entry(LOGGER_DEBUG, 0,
-		"socket_gen(): WSAStartup(): WinSock %d.%d",
-		WINSOCK_MAJOR, WINSOCK_MINOR);
-
-	if((l_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
+	if((s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
 		// Some error occured with socket()
-		log_entry(LOGGER_ERROR, WSAGetLastError(), "socket_gen(): socket() failed");
-		socket_cleanup(0, 1); // No need to socket_cleanup socket as it failed
-		exit(1);
+		log_error("socket_init_server(): socket() failed: %d",
+			WSAGetLastError());
+		closesocket(s);
+		return -1;
 	}
 
-	log_entry(LOGGER_DEBUG, l_socket, "socket_gen(): socket()");
+	if((bind(s, (struct sockaddr *)&addr, sizeof addr)) == SOCKET_ERROR) {
+		log_error("socket_init_server: bind() failed: %d",
+			WSAGetLastError());
+		closesocket(s);
+		return -1;
+	}
 
-	return l_socket;
+	if(listen(s, MAX_BACKLOG) == SOCKET_ERROR) {
+		log_error("socket_init_server(): listen() failed: %d",
+			WSAGetLastError());
+		closesocket(s);
+		return -1;
+	}
+
+	return s;
 }

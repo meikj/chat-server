@@ -6,8 +6,8 @@
 	#define WINSOCK_MINOR	1
 	#define MAX_BACKLOG 	10
 
-	void socket_cleanup(int socket, int wsa_cleanup);
+    int socket_init();
 	struct sockaddr_in socket_init_addr(const char *host, int port);
-	int socket_gen();
+    int socket_init_server(struct sockaddr_in);
 
 #endif
