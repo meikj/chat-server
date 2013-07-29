@@ -36,10 +36,34 @@ void handle_socket(int s) {
 			log_entry(LOGGER_INFO, 0,
 				"handle_socket(%d): connection closed", s);
 		} else {
-			log_entry(LOGGER_ERROR, 0,
-				"handle_socket(%d): recv() failed: %d", s, WSAGetLastError());
+			log_entry(LOGGER_ERROR, WSAGetLastError(),
+				"handle_socket(%d): recv() failed", s);
 		}
 	} while(res > 0);
+}
+
+/*
+ * Begins the main program loop of accepting incoming client connections. The
+ * function takes a function pointer to a client socket handler function. This
+ * function is executed when a client successfully connects.
+ *
+ * Params:
+ *		l_socket	= The listener socket descriptor
+ *		handler		= Function pointer to the client socket handler function
+ */
+void wait_for_client(int l_socket, void(*handler)(int)) {
+	int c_socket;
+
+	if((c_socket = accept(l_socket, NULL, NULL)) == INVALID_SOCKET) {
+		log_entry(LOGGER_ERROR, WSAGetLastError(),
+			"wait_for_client(): accept() failed");
+		cleanup(l_socket, 1);
+		exit(1);
+	}
+
+	log_entry(LOGGER_INFO, 0,
+		"wait_for_client(): accept() was successful: c_socket = %d", c_socket);
+	handler(c_socket);
 }
 
 /*
@@ -100,21 +124,8 @@ int main(int argc, char *argv[]) {
 	log_entry(LOGGER_DEBUG, 0, "main(): listen() was successful: socket = %d, backlog = %d",
 		l_socket, MAX_BACKLOG);
 
-	log_entry(LOGGER_INFO, 0, "main(): waiting for connection(s)...");
-	for(;;) {
-		// Main program loop
-		c_socket = accept(l_socket, NULL, NULL);
-
-		if(c_socket == INVALID_SOCKET) {
-			log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): accept() failed");
-			cleanup(l_socket, 1);
-			exit(1);
-		}
-
-		log_entry(LOGGER_INFO, 0, "main(): accept() was successful: c_socket = %d", c_socket);
-
-		handle_socket(c_socket);
-	}
+	log_entry(LOGGER_INFO, 0, "main(): wait_for_client() loop initiated");
+	wait_for_client(l_socket, &handle_socket);
 
 	// Perform final clean up code
 	cleanup(l_socket, 1);
