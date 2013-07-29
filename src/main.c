@@ -34,13 +34,13 @@ void handle_client(int s) {
 
 		if(res > 0) {
 			log_entry(LOGGER_INFO, 0,
-				"handle_socket(%d): recv() = %d bytes", s, res);
+				"handle_client(%d): recv() = %d bytes", s, res);
 		} else if(res == 0) {
 			log_entry(LOGGER_INFO, 0,
-				"handle_socket(%d): connection closed", s);
+				"handle_client(%d): connection closed", s);
 		} else {
 			log_entry(LOGGER_ERROR, WSAGetLastError(),
-				"handle_socket(%d): recv() failed", s);
+				"handle_client(%d): recv() failed", s);
 		}
 	} while(res > 0);
 }
@@ -61,7 +61,7 @@ void wait_for_client(int l_socket, void(*handler)(int)) {
 		if((c_socket = accept(l_socket, NULL, NULL)) == INVALID_SOCKET) {
 			log_entry(LOGGER_ERROR, WSAGetLastError(),
 				"wait_for_client(): accept() failed");
-			cleanup(l_socket, 1);
+			socket_cleanup(l_socket, 1);
 			exit(1);
 		}
 
@@ -74,19 +74,65 @@ void wait_for_client(int l_socket, void(*handler)(int)) {
 }
 
 /*
+ * Initialise the server
+ *
+ * Params:
+ *	host = The host to listen on
+ *	port = The port to listen on
+ *
+ * Returns:
+ *	The listening socket descriptor
+ */
+int init_server_socket(char *host, int port) {
+	int s;
+	struct sockaddr_in addr;
+
+	log_entry(LOGGER_DEBUG, 0, "init_server_socket(): s = socket_gen()");
+	s = socket_gen();
+
+	log_entry(LOGGER_DEBUG, 0,
+		"init_server_socket(): addr = socket_init_addr()");
+	addr = socket_init_addr(host, port);
+
+	if((bind(s, (struct sockaddr *)&addr, sizeof addr)) == SOCKET_ERROR) {
+		log_entry(LOGGER_ERROR, WSAGetLastError(),
+			"init_server_socket(): bind() failed");
+		socket_cleanup(s, 1);
+		exit(1);
+	}
+
+	log_entry(LOGGER_INFO, 0,
+		"init_server_socket(): bind(): host = %s, port = %i",
+		host, port);
+
+	if(listen(s, MAX_BACKLOG) == SOCKET_ERROR) {
+		log_entry(LOGGER_ERROR, WSAGetLastError(),
+			"init_server_socket(): listen() failed");
+		socket_cleanup(s, 1);
+		exit(1);
+	}
+
+	log_entry(LOGGER_INFO, 0,
+		"init_server_socket(): listen(): socket = %d, backlog = %d",
+		s, MAX_BACKLOG);
+
+	return s;
+}
+
+/*
  * The following arguments are accepted:
- *		host - The host to listen on
- *		port - The port number to listen on
+ *	host = The host to listen on
+ *	port = The port number to listen on
  *
  * Example usage: ./chat-server.exe 127.0.0.1 5000
+ *
+ * If no arguments are passed, the default values from DEFAULT_HOST and
+ * DEFAULT_HOST are used
  */
 int main(int argc, char *argv[]) {
 	int l_socket;
 	char *l_host;
 	int l_port;
-	struct sockaddr_in l_addr;
-
-	l_socket = init_socket();
 
 	if(argc >= 3) {
 		l_host = argv[1];
@@ -99,7 +145,7 @@ int main(int argc, char *argv[]) {
 	// Do some primitive port checking
 	if(l_port == 0) {
 		log_entry(LOGGER_ERROR, 0, "main(): invalid port specified");
-		cleanup(l_socket, 1);
+		socket_cleanup(l_socket, 1);
 		exit(1);
 	}
 
@@ -107,32 +153,14 @@ int main(int argc, char *argv[]) {
 	log_entry(LOGGER_DEBUG, 0, "main(): l_host = %s", l_host);
 	log_entry(LOGGER_DEBUG, 0, "main(): l_port = %d", l_port);
 
-	// Create address structure and bind socket
-	l_addr = init_server_addr(l_host, l_port);
-
-	if((bind(l_socket, (struct sockaddr *)&l_addr, sizeof l_addr)) == SOCKET_ERROR) {
-		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): bind() failed");
-		cleanup(l_socket, 1);
-		exit(1);
-	}
-
-	log_entry(LOGGER_INFO, 0, "main(): bind() was successful: address = %s, port = %i",
-		l_host, l_port);
-
-	if(listen(l_socket, MAX_BACKLOG) == SOCKET_ERROR) {
-		log_entry(LOGGER_ERROR, WSAGetLastError(), "main(): listen() failed");
-		cleanup(l_socket, 1);
-		exit(1);
-	}
-
-	log_entry(LOGGER_INFO, 0, "main(): listen() was successful: socket = %d, backlog = %d",
-		l_socket, MAX_BACKLOG);
+	log_entry(LOGGER_DEBUG, 0, "main(): l_socket = init_server_socket()");
+	l_socket = init_server_socket(l_host, l_port);
 
 	log_entry(LOGGER_INFO, 0, "main(): wait_for_client() loop initiated");
 	wait_for_client(l_socket, &handle_client);
 
 	// Perform final clean up code
-	cleanup(l_socket, 1);
+	socket_cleanup(l_socket, 1);
 
 	return 0;
 }
