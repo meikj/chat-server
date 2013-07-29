@@ -19,17 +19,13 @@
 
         #define INVALID_SOCKET -1
         #define SOCKET_ERROR -1
-
         #define WSAGetLastError() errno
+        #define closesocket(s) close(s)
     #endif
 
     int socket_init();
 	struct sockaddr_in socket_init_addr(const char *host, int port);
     int socket_init_server(struct sockaddr_in);
-
-    #ifndef _WIN32
-        #define closesocket(s) close(s)
-    #endif
 
     // Represents a client in the server
     typedef struct {
