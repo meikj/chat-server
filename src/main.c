@@ -14,17 +14,18 @@
 #include "logger.h"
 #include "socket.h"
 
-#define DEFAULT_HOST 127.0.0.1
+#define DEFAULT_HOST "127.0.0.1"
 #define DEFAULT_PORT 5000
 #define BUFFER_LEN 512
 
 /*
- * Handle an accepted client socket connection until it dies.
+ * Handle an accepted client socket connection until it dies. This function
+ * receives data from the client and outputs the number of bytes received.
  *
  * Params:
  *		s = Client socket descriptor
  */
-void handle_socket(int s) {
+void handle_client(int s) {
 	char buf[BUFFER_LEN];
 	int res;
 
@@ -66,6 +67,8 @@ void wait_for_client(int l_socket, void(*handler)(int)) {
 
 		log_entry(LOGGER_INFO, 0,
 			"wait_for_client(): accept() was successful: c_socket = %d", c_socket);
+		log_entry(LOGGER_INFO, 0,
+			"wait_for_client(): passing client on to handler...");
 		handler(c_socket);
 	}
 }
@@ -113,7 +116,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	log_entry(LOGGER_DEBUG, 0, "main(): bind() was successful: address = %s, port = %i",
+	log_entry(LOGGER_INFO, 0, "main(): bind() was successful: address = %s, port = %i",
 		l_host, l_port);
 
 	if(listen(l_socket, MAX_BACKLOG) == SOCKET_ERROR) {
@@ -122,11 +125,11 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	log_entry(LOGGER_DEBUG, 0, "main(): listen() was successful: socket = %d, backlog = %d",
+	log_entry(LOGGER_INFO, 0, "main(): listen() was successful: socket = %d, backlog = %d",
 		l_socket, MAX_BACKLOG);
 
 	log_entry(LOGGER_INFO, 0, "main(): wait_for_client() loop initiated");
-	wait_for_client(l_socket, &handle_socket);
+	wait_for_client(l_socket, &handle_client);
 
 	// Perform final clean up code
 	cleanup(l_socket, 1);
