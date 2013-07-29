@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "logger.h"
 #include "socket.h"
@@ -17,16 +18,28 @@
 
 // Basic data structure storing all connected clients
 socket_client *clients[MAX_CLIENTS];
+int count = 0;
 
 /*
  * Handle a client connection.
  *
  * Params:
  *	s = The client socket descriptor
+ *	addr = The client socket address
  */
-void handle_client(int s) {
+void handle_client(int s, struct sockaddr_in addr) {
 	char buf[DEFAULT_BUF_SIZE];
 	int res;
+	socket_client c;
+	int c_pos = count;
+
+	// Populate the client structure using the socket and address details
+	c.socket = s;
+	memcpy(&c.addr, &addr, sizeof(struct sockaddr_in));
+
+	// Add client to list
+	clients[c_pos] = malloc(sizeof(socket_client));
+	memcpy(&clients[c_pos], &c, sizeof(socket_client));
 
 	do {
 		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
@@ -40,6 +53,9 @@ void handle_client(int s) {
 				s, WSAGetLastError());
 		}
 	} while(res > 0);
+
+	// Clean up client
+	free(clients[c_pos]);
 }
 
 /*
@@ -58,6 +74,11 @@ int main(int argc, char *argv[]) {
 	int l_socket; // Server socket
 	struct sockaddr_in l_addr;
 	int c_socket; // Client socket
+	struct sockaddr_in c_addr;
+	socket_client *c;
+
+	// This is used for the address size in accept()
+	socklen_t socksize = sizeof(struct sockaddr_in);
 
 	log_info("Validating server information... ", NULL);
 	if(argc >= 3) {
@@ -89,12 +110,13 @@ int main(int argc, char *argv[]) {
 	log_info("Server is ready to accept client connections on %s:%d\n",
 		host, port);
 	for(;;) {
-		if((c_socket = accept(l_socket, NULL, NULL)) == INVALID_SOCKET) {
+		if((c_socket = accept(l_socket, (struct sockaddr *)&c_addr,
+			&socksize)) == INVALID_SOCKET) {
 			log_error("Client accept() failed: %d\n", c_socket);
 			continue;
 		} else {
 			log_info("Client connection accepted, passed on to handler: %d\n", c_socket);
-			handle_client(c_socket);
+			handle_client(c_socket, c_addr);
 		}
 	}
 
