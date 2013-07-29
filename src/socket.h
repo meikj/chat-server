@@ -10,7 +10,17 @@
     #ifdef _WIN32
         #include <winsock.h>
     #else
-        // UNIX variants here
+        #include <sys/types.h>
+        #include <sys/socket.h>
+        #include <netinet/in.h>
+        #include <arpa/inet.h>
+        #include <unistd.h>
+        #include <errno.h>
+
+        #define INVALID_SOCKET -1
+        #define SOCKET_ERROR -1
+
+        #define WSAGetLastError() errno
     #endif
 
     int socket_init();
