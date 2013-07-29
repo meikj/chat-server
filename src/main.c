@@ -53,10 +53,8 @@ void handle_client(int s) {
 int main(int argc, char *argv[]) {
 	char *host;
 	int port;
-
 	int l_socket; // Server socket
 	struct sockaddr_in l_addr;
-
 	int c_socket; // Client socket
 
 	log_info("Validating server information... ", NULL);
@@ -80,9 +78,7 @@ int main(int argc, char *argv[]) {
 	if(socket_init() == -1) {
 		exit(1);
 	}
-
 	l_addr = socket_init_addr(host, port);
-
 	if((l_socket = socket_init_server(l_addr)) == -1) {
 		exit(1);
 	}
