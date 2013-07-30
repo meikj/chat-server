@@ -54,18 +54,19 @@ int socket_init() {
  * Params:
  *	host = Host name/IP address of computer to host on
  *	port = Port number to host on
+ *	addr = A pointer to the socket address structure to write to
  *
  * Returns:
- *	The socket address structure.
+ *	If the function was successful, then zero is returned, otherwise -1.
  */
-struct sockaddr_in socket_init_addr(const char *host, int port) {
-	struct sockaddr_in addr;
-
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr(host);
-	addr.sin_port = htons(port);
-
-	return addr;
+int socket_init_addr(const char *host, int port, struct sockaddr_in *addr) {
+	addr->sin_family = AF_INET;
+	addr->sin_port = htons(port);
+	if(inet_pton(AF_INET, host, &(addr->sin_addr.s_addr)) == 0) {
+		log_error("Host is invalid: %s\n", host);
+		return -1;
+	}
+	return 0;
 }
 
 /*
@@ -83,22 +84,22 @@ int socket_init_server(struct sockaddr_in addr) {
 	if((s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
 		// Some error occured with socket()
 		log_error("socket_init_server(): socket() failed: %d",
-			WSAGetLastError());
-		closesocket(s);
+			errno);
+		close(s);
 		return -1;
 	}
 
 	if((bind(s, (struct sockaddr *)&addr, sizeof addr)) == SOCKET_ERROR) {
 		log_error("socket_init_server: bind() failed: %d",
-			WSAGetLastError());
-		closesocket(s);
+			errno);
+		close(s);
 		return -1;
 	}
 
 	if(listen(s, MAX_BACKLOG) == SOCKET_ERROR) {
 		log_error("socket_init_server(): listen() failed: %d",
-			WSAGetLastError());
-		closesocket(s);
+			errno);
+		close(s);
 		return -1;
 	}
 

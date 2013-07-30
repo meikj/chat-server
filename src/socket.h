@@ -9,6 +9,9 @@
 
     #ifdef _WIN32
         #include <winsock.h>
+
+        #define close(s) closesocket(s)
+        #define errno WSAGetLastError()
     #else
         #include <sys/types.h>
         #include <sys/socket.h>
@@ -19,12 +22,10 @@
 
         #define INVALID_SOCKET -1
         #define SOCKET_ERROR -1
-        #define WSAGetLastError() errno
-        #define closesocket(s) close(s)
     #endif
 
     int socket_init();
-	struct sockaddr_in socket_init_addr(const char *host, int port);
+	int socket_init_addr(const char *host, int port, struct sockaddr_in *addr);
     int socket_init_server(struct sockaddr_in);
 
 #endif
