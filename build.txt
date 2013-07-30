@@ -1,5 +1,5 @@
 Windows:
-gcc -std=c99 -o../bin/chat-server logger.c socket.c protocol.c main.c -lwsock32
+gcc -std=c99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c -lwsock32
 
 Linux:
-gcc -std=c99 -o../bin/chat-server logger.c socket.c protocol.c main.c
+gcc -std=c99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c
