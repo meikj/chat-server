@@ -42,32 +42,35 @@ void handle_client(int s, struct sockaddr_in addr) {
 	int res;
 	client c;
 	int c_id;
+	char *ip;
 
 	// Populate the client structure using the socket and address details
 	c.socket = s;
 	memcpy(&c.addr, &addr, sizeof(struct sockaddr_in));
 	if((c_id = clients_add(&c)) == -1) {
-		closesocket(s);
+		close(s);
 		return;
 	}
 
-	log_info("Client(id:%d,s:%d): successfully generated ID\n", c_id, s);
+	ip = clients_get_ip(c_id);
+	log_info("Client(id:%d, s:%d): connected from %s\n", c_id, s, ip);
 
 	do {
 		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
 
 		if(res > 0) {
-			log_info("Client(id:%d,s:%d): recv = %d bytes\n", c_id, s, res);
+			log_info("Client(id:%d, s:%d): recv = %d bytes\n", c_id, s, res);
 		} else if(res == 0) {
-			log_info("Client(id:%d,s:%d): connection closed\n", c_id, s);
+			log_info("Client(id:%d, s:%d): connection closed\n", c_id, s);
 		} else {
-			log_error("handle_client(id:%d,s:%d): recv() failed: %d\n",
-				c_id, s, WSAGetLastError());
+			log_error("handle_client(id:%d, s:%d): recv() failed: %d\n",
+				c_id, s, errno);
 		}
 	} while(res > 0);
 
 	// Clean up client
 	clients_remove(c_id);
+	free(ip);
 }
 
 /*
@@ -87,12 +90,10 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in l_addr;
 	int c_socket; // Client socket
 	struct sockaddr_in c_addr;
-	client *c;
 
 	// This is used for the address size in accept()
 	socklen_t socksize = sizeof(struct sockaddr_in);
 
-	log_info("Validating server information... ", NULL);
 	if(argc >= 3) {
 		host = argv[1];
 		port = atoi(argv[2]);
@@ -103,17 +104,17 @@ int main(int argc, char *argv[]) {
 
 	// Do some primitive port checking
 	if(port == 0) {
-		log("failed\n", NULL);
+		log_error("Port number is invalid: %d\n", port);
 		exit(1);
-	} else {
-		log("success\n", NULL);
 	}
 
 	// Initialise socket address structure and server socket
 	if(socket_init() == -1) {
 		exit(1);
 	}
-	l_addr = socket_init_addr(host, port);
+	if(socket_init_addr(host, port, &l_addr) == -1) {
+		exit(1);
+	}
 	if((l_socket = socket_init_server(l_addr)) == -1) {
 		exit(1);
 	}
@@ -134,7 +135,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Perform final clean up code
-	closesocket(l_socket);
+	close(l_socket);
 
 	return 0;
 }
