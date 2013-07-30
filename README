@@ -2,6 +2,4 @@ Chat Server
 
 This project is intended for educational purposes. The main reason for the
 development of this software is to further my understanding of networking.
-At the moment the software uses WinSock, but I have plans to incorporate
-BSD/POSIX sockets for future Linux compatibility. This project is presently
-far from complete. No production value intended.
+This project is presently far from complete. No production value intended.
