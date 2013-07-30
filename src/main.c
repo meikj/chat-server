@@ -17,6 +17,19 @@
 #define DEFAULT_PORT 5000
 #define DEFAULT_BUF_SIZE 256
 
+// Debug use
+void list_clients() {
+	client **list = clients_list();
+
+	for(int i = 1; i < MAX_CLIENTS; i++) {
+		if(list[i] == NULL) {
+			printf("[%d] = no record\n", i);
+		} else {
+			printf("[%d] = yep!\n", i);
+		}
+	}
+}
+
 /*
  * Handle a client connection.
  *
@@ -37,9 +50,6 @@ void handle_client(int s, struct sockaddr_in addr) {
 		closesocket(s);
 		return;
 	}
-
-	client *test = clients_get(c_id);
-	printf("test->socket = %d\ttest->addr.sin_family = %d\n", test->socket, test->addr.sin_family);
 
 	do {
 		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
