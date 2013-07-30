@@ -1,5 +1,5 @@
 Windows:
-gcc -std=c99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c -lwsock32
+Use Visual Studio or Visual Studio C compiler. There is no support under MinGW for InetPton/InetNtop (from ws2tcpip.h)
 
 Linux:
 gcc -std=c99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c

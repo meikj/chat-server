@@ -15,10 +15,10 @@
 	void _file_entry();
 
 	// Kind of wrapper functions to simplify logging
-	#define log(message, args...) log_entry(0, message, args)
-	#define log_debug(message, args...) log_entry(LOGGER_DEBUG, message, args)
-	#define log_info(message, args...) log_entry(LOGGER_INFO, message, args)
-	#define log_warn(message, args...) log_entry(LOGGER_WARNING, message, args)
-	#define log_error(message, args...) log_entry(LOGGER_ERROR, message, args)
+	#define log(message, ...) log_entry(0, message, __VA_ARGS__)
+	#define log_debug(message, ...) log_entry(LOGGER_DEBUG, message, __VA_ARGS__)
+	#define log_info(message, ...) log_entry(LOGGER_INFO, message, __VA_ARGS__)
+	#define log_warn(message, ...) log_entry(LOGGER_WARNING, message, __VA_ARGS__)
+	#define log_error(message, ...) log_entry(LOGGER_ERROR, message, __VA_ARGS__)
 
 #endif

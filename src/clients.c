@@ -21,7 +21,8 @@ unsigned count = 0;
  * Initialise the clients data structure.
  */
 void clients_init() {
-	for(int i = 1; i < MAX_CLIENTS; i++) {
+	int i;
+	for(i = 1; i < MAX_CLIENTS; i++) {
 		clients[i] = NULL;
 	}
 }
@@ -30,7 +31,8 @@ void clients_init() {
  * Generate a simple client ID.
  */
 unsigned clients_id_gen() {
-	for(unsigned i = 1; i < MAX_CLIENTS; i++) {
+	unsigned i;
+	for(i = 1; i < MAX_CLIENTS; i++) {
 		if(clients[i] == NULL) {
 			return i;
 		}
@@ -65,6 +67,8 @@ client *clients_get(const unsigned id) {
  *	If the function was successful, then 0 is returned, otherwise -1.
  */
 int clients_add(client *c) {
+	int c_id;
+
 	if(c == NULL) {
 		log_error("clients_add(): null client passed\n", NULL);
 		return -1;
@@ -72,8 +76,6 @@ int clients_add(client *c) {
 		log_warn("clients_add(): maximum number of clients connected\n", NULL);
 		return -1;
 	}
-
-	int c_id;
 
 	if((c_id = clients_id_gen()) == 0) {
 		log_error("clients_add(): problem generating a client ID\n", NULL);
@@ -121,6 +123,8 @@ client **clients_list() {
  * Fetch the IP address of a client.
  */
 char *clients_get_ip(const unsigned id) {
+	char *ip;
+
 	if(id < 1 || id > MAX_CLIENTS) {
 		log_error("clients_get_ip(): invalid id passed: %d\n", id);
 		return NULL;
@@ -129,7 +133,7 @@ char *clients_get_ip(const unsigned id) {
 		return NULL;
 	}
 
-	char *ip = malloc(INET_ADDRSTRLEN);
+	ip = (char *)malloc(INET_ADDRSTRLEN);
 	inet_ntop(AF_INET, &(clients[id]->addr.sin_addr), ip, INET_ADDRSTRLEN);
 	return ip;
 }

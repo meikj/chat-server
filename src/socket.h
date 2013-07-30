@@ -8,10 +8,15 @@
 
     #ifdef _WIN32
         // Windows headers and definitions
-        #include <winsock.h>
+        #include <winsock2.h>
+        #include <ws2tcpip.h>
+
+		#pragma comment(lib, "ws2_32.lib")
 
         #define close(s) closesocket(s)
-        #define errno WSAGetLastError()
+        //#define errno WSAGetLastError()
+        #define inet_pton(af, src, dst) InetPton(af, src, dst)
+        #define inet_ntop(af, addr, buf, len) InetNtop(af, addr, buf, len)
     #else
         // Linux headers and definitions
         #include <sys/types.h>

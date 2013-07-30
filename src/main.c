@@ -19,9 +19,10 @@
 
 // Debug use
 void list_clients() {
+	int i;
 	client **list = clients_list();
 
-	for(int i = 1; i < MAX_CLIENTS; i++) {
+	for(i = 1; i < MAX_CLIENTS; i++) {
 		if(list[i] == NULL) {
 			printf("[%d] = no record\n", i);
 		} else {
