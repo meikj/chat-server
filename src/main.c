@@ -11,14 +11,11 @@
 
 #include "logger.h"
 #include "socket.h"
+#include "clients.h"
 
 #define DEFAULT_HOST "127.0.0.1"
 #define DEFAULT_PORT 5000
 #define DEFAULT_BUF_SIZE 256
-
-// Basic data structure storing all connected clients
-socket_client *clients[MAX_CLIENTS];
-int count = 0;
 
 /*
  * Handle a client connection.
@@ -30,16 +27,19 @@ int count = 0;
 void handle_client(int s, struct sockaddr_in addr) {
 	char buf[DEFAULT_BUF_SIZE];
 	int res;
-	socket_client c;
-	int c_pos = count++;
+	client c;
+	int c_id;
 
 	// Populate the client structure using the socket and address details
 	c.socket = s;
 	memcpy(&c.addr, &addr, sizeof(struct sockaddr_in));
+	if((c_id = clients_add(&c)) == -1) {
+		closesocket(s);
+		return;
+	}
 
-	// Add client to list
-	clients[c_pos] = malloc(sizeof(socket_client));
-	memcpy(&clients[c_pos], &c, sizeof(socket_client));
+	client *test = clients_get(c_id);
+	printf("test->socket = %d\ttest->addr.sin_family = %d\n", test->socket, test->addr.sin_family);
 
 	do {
 		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
@@ -55,7 +55,7 @@ void handle_client(int s, struct sockaddr_in addr) {
 	} while(res > 0);
 
 	// Clean up client
-	free(clients[c_pos]);
+	clients_remove(c_id);
 }
 
 /*
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in l_addr;
 	int c_socket; // Client socket
 	struct sockaddr_in c_addr;
-	socket_client *c;
+	client *c;
 
 	// This is used for the address size in accept()
 	socklen_t socksize = sizeof(struct sockaddr_in);
@@ -110,6 +110,7 @@ int main(int argc, char *argv[]) {
 	log_info("Server is ready to accept client connections on %s:%d\n",
 		host, port);
 	for(;;) {
+		clients_init();
 		if((c_socket = accept(l_socket, (struct sockaddr *)&c_addr,
 			&socksize)) == INVALID_SOCKET) {
 			log_error("Client accept() failed: %d\n", c_socket);
