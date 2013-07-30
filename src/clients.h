@@ -12,6 +12,7 @@
     } client;
 
     void clients_init();
+    unsigned clients_id_gen();
 	client *clients_get(const unsigned id);
 	int clients_add(client *c);
 	int clients_remove(const unsigned id);
