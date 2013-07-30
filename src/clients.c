@@ -99,3 +99,10 @@ int clients_remove(const unsigned id) {
 	count--;
 	return 0;
 }
+
+/*
+ * Return a pointer to the list of clients.
+ */
+client **clients_list() {
+	return clients;
+}
