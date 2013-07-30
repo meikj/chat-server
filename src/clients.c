@@ -90,14 +90,14 @@ int clients_add(client *c) {
  *	If the function was successful, then 0 is returned, otherwise -1.
  */
 int clients_remove(const unsigned id) {
-	if(id > MAX_CLIENTS) {
+	if(id < 1 || id > MAX_CLIENTS) {
 		log_error("clients_remove(): invalid id passed: %d\n", id);
 		return -1;
 	} else if(clients[id] == NULL) {
-		log_error("clients_remove(): no record at id %d\n", id);
+		log_error("clients_remove(): no record at id: %d\n", id);
 		return -1;
 	}
-	closesocket(clients[id]->socket);
+	close(clients[id]->socket);
 	free(clients[id]);
 	clients[id] = NULL;
 	count--;
@@ -109,4 +109,21 @@ int clients_remove(const unsigned id) {
  */
 client **clients_list() {
 	return clients;
+}
+
+/*
+ * Fetch the IP address of a client.
+ */
+char *clients_get_ip(const unsigned id) {
+	if(id < 1 || id > MAX_CLIENTS) {
+		log_error("clients_get_ip(): invalid id passed: %d\n", id);
+		return NULL;
+	} else if(clients[id] == NULL) {
+		log_error("clients_get_ip(): no record at id: %d\n", id);
+		return NULL;
+	}
+
+	char *ip = malloc(INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &(clients[id]->addr.sin_addr), ip, INET_ADDRSTRLEN);
+	return ip;
 }
