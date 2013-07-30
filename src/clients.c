@@ -1,3 +1,10 @@
+/*
+ * clients.c
+ *
+ * Represents a basic data structure for storing clients.
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,14 +21,13 @@ unsigned count = 0;
  * Initialise the clients data structure.
  */
 void clients_init() {
-	// Initialise the clients list
 	for(int i = 1; i < MAX_CLIENTS; i++) {
 		clients[i] = NULL;
 	}
 }
 
 /*
- * Generate a client ID.
+ * Generate a simple client ID.
  */
 unsigned clients_id_gen() {
 	for(unsigned i = 1; i < MAX_CLIENTS; i++) {
@@ -39,7 +45,7 @@ unsigned clients_id_gen() {
  *	id = The client ID
  *
  * Returns:
- *	The resulting client structure.
+ *	The resulting client structure, or NULL if no such client exists.
  */
 client *clients_get(const unsigned id) {
 	if(id < 1 || id > MAX_CLIENTS) {

@@ -1,9 +1,8 @@
 /*
  * logger.c
  *
- * Used for logging to the standard output and/or log file.
- * Supports different levels of logging, as well as setting a minimum log
- * priority.
+ * Used for logging to the standard output and/or log file. Supports different
+ * levels of logging, as well as setting a minimum log priority.
  *
  */
 

@@ -1,7 +1,7 @@
 /*
  * main.c
  *
- * Basic server being programmed in C for educational purposes.
+ * Basic chat server programmed in C for educational purposes.
  *
  */
 

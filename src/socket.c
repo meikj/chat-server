@@ -1,7 +1,8 @@
 /*
- * socket.h
+ * socket.c
  *
- * Contains functions for socket management.
+ * Contains functionality for starting up socket services and creating server
+ * sockets.
  *
  */
 
@@ -23,6 +24,7 @@ WSADATA wsaData;
  */
 int socket_init() {
 	#ifdef _WIN32
+	// Windows specific WSAStartup code
 	int error;
 
 	error = WSAStartup(MAKEWORD(WINSOCK_MAJOR, WINSOCK_MINOR), &wsaData);

@@ -5,14 +5,15 @@
 	#define WINSOCK_MAJOR	1
 	#define WINSOCK_MINOR	1
 	#define MAX_BACKLOG 	10
-    
 
     #ifdef _WIN32
+        // Windows headers and definitions
         #include <winsock.h>
 
         #define close(s) closesocket(s)
         #define errno WSAGetLastError()
     #else
+        // Linux headers and definitions
         #include <sys/types.h>
         #include <sys/socket.h>
         #include <netinet/in.h>
