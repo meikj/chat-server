@@ -93,7 +93,11 @@ int clients_remove(const unsigned id) {
 	if(id > MAX_CLIENTS) {
 		log_error("clients_remove(): invalid id passed: %d\n", id);
 		return -1;
+	} else if(clients[id] == NULL) {
+		log_error("clients_remove(): no record at id %d\n", id);
+		return -1;
 	}
+	closesocket(clients[id]->socket);
 	free(clients[id]);
 	clients[id] = NULL;
 	count--;

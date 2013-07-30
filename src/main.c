@@ -51,16 +51,18 @@ void handle_client(int s, struct sockaddr_in addr) {
 		return;
 	}
 
+	log_info("Client(id:%d,s:%d): successfully generated ID\n", c_id, s);
+
 	do {
 		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
 
 		if(res > 0) {
-			log_info("Client(%d): recv = %d bytes\n", s, res);
+			log_info("Client(id:%d,s:%d): recv = %d bytes\n", c_id, s, res);
 		} else if(res == 0) {
-			log_info("Client(%d): connection closed\n", s);
+			log_info("Client(id:%d,s:%d): connection closed\n", c_id, s);
 		} else {
-			log_error("handle_client(%d): recv() failed: %d\n",
-				s, WSAGetLastError());
+			log_error("handle_client(id:%d,s:%d): recv() failed: %d\n",
+				c_id, s, WSAGetLastError());
 		}
 	} while(res > 0);
 
