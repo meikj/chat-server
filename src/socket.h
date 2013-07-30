@@ -5,7 +5,7 @@
 	#define WINSOCK_MAJOR	1
 	#define WINSOCK_MINOR	1
 	#define MAX_BACKLOG 	10
-    #define MAX_CLIENTS     20
+    
 
     #ifdef _WIN32
         #include <winsock.h>
@@ -26,11 +26,5 @@
     int socket_init();
 	struct sockaddr_in socket_init_addr(const char *host, int port);
     int socket_init_server(struct sockaddr_in);
-
-    // Represents a client in the server
-    typedef struct {
-        int socket;
-        struct sockaddr_in addr;
-    } socket_client;
 
 #endif
