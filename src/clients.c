@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "logger.h"
-#include "socket.h"
+#include "server.h"
 #include "clients.h"
 
 // Basic data structure containing the connected clients (0 is NOT used)
@@ -82,7 +82,7 @@ int clients_add(client *c) {
 		return -1;
 	}
 
-	clients[c_id] = malloc(sizeof(client));
+	clients[c_id] = (client *)malloc(sizeof(client));
 	memcpy(clients[c_id], c, sizeof(client));
 	count++;
 	return c_id;

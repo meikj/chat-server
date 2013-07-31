@@ -1,8 +1,9 @@
 #ifndef CLIENTS_H
 
 	#define CLIENTS_H
-	
-	#include "socket.h"
+
+	#include "server.h"
+
 	#define MAX_CLIENTS 20
 
 	// Represents a client in the server
