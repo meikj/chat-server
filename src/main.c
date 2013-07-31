@@ -10,12 +10,11 @@
 #include <string.h>
 
 #include "logger.h"
-#include "socket.h"
+#include "server.h"
 #include "clients.h"
 
-#define DEFAULT_HOST "127.0.0.1"
-#define DEFAULT_PORT 5000
-#define DEFAULT_BUF_SIZE 256
+#define DEFAULT_PORT "5000"
+#define BUF_SIZE 256
 
 // Debug use
 void list_clients() {
@@ -39,13 +38,14 @@ void list_clients() {
  *	addr = The client socket address
  */
 void handle_client(int s, struct sockaddr_in addr) {
-	char buf[DEFAULT_BUF_SIZE];
+	char buf[BUF_SIZE];
 	int res;
 	client c;
 	int c_id;
 	char *ip;
 
 	// Populate the client structure using the socket and address details
+	memset(&c, 0, sizeof c);
 	c.socket = s;
 	memcpy(&c.addr, &addr, sizeof(struct sockaddr_in));
 	if((c_id = clients_add(&c)) == -1) {
@@ -54,17 +54,17 @@ void handle_client(int s, struct sockaddr_in addr) {
 	}
 
 	ip = clients_get_ip(c_id);
-	log_info("Client(id:%d, s:%d): connected from %s\n", c_id, s, ip);
+	log_info("Client(id:%d): connected from %s\n", c_id, s, ip);
 
 	do {
-		res = recv(s, buf, DEFAULT_BUF_SIZE, 0);
+		res = recv(s, buf, BUF_SIZE, 0);
 
 		if(res > 0) {
-			log_info("Client(id:%d, s:%d): recv = %d bytes\n", c_id, s, res);
+			log_info("Client(id:%d): recv = %d bytes\n", c_id, s, res);
 		} else if(res == 0) {
-			log_info("Client(id:%d, s:%d): connection closed\n", c_id, s);
+			log_info("Client(id:%d): connection closed\n", c_id, s);
 		} else {
-			log_error("handle_client(id:%d, s:%d): recv() failed: %d\n",
+			log_error("handle_client(id:%d): recv() failed: %d\n",
 				c_id, s, errno);
 		}
 	} while(res > 0);
@@ -75,54 +75,45 @@ void handle_client(int s, struct sockaddr_in addr) {
 }
 
 /*
- * The following arguments are accepted:
- *	host = The host to listen on
+ * The following argument is accepted:
  *	port = The port number to listen on
  *
- * Example usage: ./chat-server.exe 127.0.0.1 5000
+ * Example usage: ./chat-server 5000
  *
- * If no arguments are passed, the default values from DEFAULT_HOST and
- * DEFAULT_HOST are used instead.
+ * If no argument is passed, the default value from DEFAULT_PORT is used.
  */
 int main(int argc, char *argv[]) {
-	char *host;
-	int port;
+	char *port;
 	int l_socket; // Server socket
-	struct sockaddr_in l_addr;
 	int c_socket; // Client socket
 	struct sockaddr_in c_addr;
 
 	// This is used for the address size in accept()
 	socklen_t socksize = sizeof(struct sockaddr_in);
 
-	if(argc >= 3) {
-		host = argv[1];
-		port = atoi(argv[2]);
+	if(argc == 2) {
+		port = argv[1];
 	} else {
-		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 	}
 
-	// Do some primitive port checking
-	if(port == 0) {
-		log_error("Port number is invalid: %d\n", port);
-		exit(1);
-	}
-
 	// Initialise socket address structure and server socket
-	if(socket_init() == -1) {
+	log_info("Initialising server...\n", NULL);
+	if(server_init() == -1) {
+		server_cleanup();
 		exit(1);
 	}
-	if(socket_init_addr(host, port, &l_addr) == -1) {
+	if(server_init_addr(port) == -1) {
+		server_cleanup();
 		exit(1);
 	}
-	if((l_socket = socket_init_server(l_addr)) == -1) {
+	if((l_socket = server_init_socket()) == -1) {
+		server_cleanup();
 		exit(1);
 	}
 
 	// Main program loop
-	log_info("Server is ready to accept client connections on %s:%d\n",
-		host, port);
+	log_info("Ready to accept client connections on port %s\n", port);
 	for(;;) {
 		clients_init();
 		if((c_socket = accept(l_socket, (struct sockaddr *)&c_addr,
@@ -135,8 +126,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	// Perform final clean up code
-	close(l_socket);
+	server_cleanup();
 
 	return 0;
 }
