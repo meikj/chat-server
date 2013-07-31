@@ -54,18 +54,18 @@ void handle_client(int s, struct sockaddr_in addr) {
 	}
 
 	ip = clients_get_ip(c_id);
-	log_info("Client(id:%d): connected from %s\n", c_id, s, ip);
+	log_info("Client(id:%d): connected from %s\n", c_id, ip);
 
 	do {
 		res = recv(s, buf, BUF_SIZE, 0);
 
 		if(res > 0) {
-			log_info("Client(id:%d): recv = %d bytes\n", c_id, s, res);
+			log_info("Client(id:%d): recv = %d bytes\n", c_id, res);
 		} else if(res == 0) {
-			log_info("Client(id:%d): connection closed\n", c_id, s);
+			log_info("Client(id:%d): connection closed\n", c_id);
 		} else {
 			log_error("handle_client(id:%d): recv() failed: %d\n",
-				c_id, s, errno);
+				c_id, errno);
 		}
 	} while(res > 0);
 
