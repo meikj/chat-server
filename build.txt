@@ -2,4 +2,4 @@ Windows:
 Use Visual Studio/VS C++ compiler as there is no support under MinGW for InetPton/InetNtop (from ws2tcpip.h), or alternatively use Cygwin.
 
 Linux:
-gcc -std=gnu99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c
+gcc -pedantic -Wall -std=gnu99 -o../bin/chat-server logger.c socket.c clients.c protocol.c main.c
