@@ -12,7 +12,7 @@
  * Parse a received client message.
  *
  */
-void protocol_parse(const int client_id, const char *message, const size_t len) {
+void protocol_parse() {
 	return;
 }
 
@@ -20,6 +20,6 @@ void protocol_parse(const int client_id, const char *message, const size_t len) 
  * The client has requested to see a list of connected clients.
  *
  */
-void protocol_get_clients(const int client_id) {
+void protocol_get_clients() {
 	return;
 }

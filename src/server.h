@@ -2,7 +2,7 @@
 
 #define SOCKET_H
 
-#define MAX_BACKLOG     10
+#define MAX_BACKLOG 10
 
 #ifdef _WIN32
 // Windows headers and definitions
@@ -11,8 +11,8 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#define WINSOCK_MAJOR   2
-#define WINSOCK_MINOR   2
+#define WINSOCK_MAJOR 2
+#define WINSOCK_MINOR 2
 
 #define close(s) closesocket(s)
 #define err WSAGetLastError()
