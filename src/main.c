@@ -12,6 +12,7 @@
 #include "logger.h"
 #include "server.h"
 #include "clients.h"
+#include "protocol.h"
 
 #define DEFAULT_PORT "27015"
 #define BUF_SIZE 256
@@ -37,7 +38,7 @@ void list_clients() {
  *	s = The client socket descriptor
  *	addr = The client socket address
  */
-void handle_client(int s, struct sockaddr_in addr) {
+void handle_client(int s, struct sockaddr_in *addr) {
 	char buf[BUF_SIZE];
 	char ip[INET_ADDRSTRLEN];
 	int res;
@@ -47,7 +48,7 @@ void handle_client(int s, struct sockaddr_in addr) {
 	// Populate the client structure using the socket and address details
 	memset(&c, 0, sizeof c);
 	c.socket = s;
-	memcpy(&c.addr, &addr, sizeof(struct sockaddr_in));
+	memcpy(&c.addr, addr, sizeof(struct sockaddr_in));
 	if((c_id = clients_add(&c)) == -1) {
 		close(s);
 		return;
@@ -57,10 +58,12 @@ void handle_client(int s, struct sockaddr_in addr) {
 	log_info("Client(id:%d): connected from %s\n", c_id, ip);
 
 	do {
+		memset(buf, 0, BUF_SIZE);
 		res = recv(s, buf, BUF_SIZE, 0);
 
 		if(res > 0) {
 			log_info("Client(id:%d): recv = %d bytes\n", c_id, res);
+			proto_parse(c_id, buf, BUF_SIZE);
 		} else if(res == 0) {
 			log_info("Client(id:%d): connection closed\n", c_id);
 		} else {
@@ -121,7 +124,7 @@ int main(int argc, char *argv[]) {
 			continue;
 		} else {
 			log_info("Client connection accepted, passed on to handler: %d\n", c_socket);
-			handle_client(c_socket, c_addr);
+			handle_client(c_socket, &c_addr);
 		}
 	}
 
