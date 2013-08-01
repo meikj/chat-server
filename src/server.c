@@ -29,7 +29,7 @@ struct addrinfo *serverinfo; // Server address structure
  *	If the function was successful 0 is returned, otherwise -1 is returned.
  */
 int server_init() {
-	#ifdef _WIN32
+#ifdef _WIN32
 	// Windows specific WSAStartup code
 	int error;
 
@@ -40,7 +40,7 @@ int server_init() {
 		log_error("socket_init(): WSAStartup() failed: %d\n", error);
 		return -1;
 	}
-	#endif
+#endif
 
 	return 0;
 }
@@ -53,9 +53,9 @@ void server_cleanup() {
 		freeaddrinfo(serverinfo);
 
 	close(serverfd);
-	#ifdef _WIN32
+#ifdef _WIN32
 	WSACleanup();
-	#endif
+#endif
 }
 
 /*
