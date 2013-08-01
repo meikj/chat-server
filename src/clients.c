@@ -49,12 +49,13 @@ unsigned clients_id_gen() {
  * Returns:
  *	The resulting client structure, or NULL if no such client exists.
  */
-client *clients_get(const unsigned id) {
+client *clients_get(const unsigned id, client *c) {
 	if(id < 1 || id > MAX_CLIENTS) {
 		log_error("clients_get(): invalid id passed: %d\n", id);
 		return NULL;
 	}
-	return clients[id];
+	c = clients[id];
+	return c;
 }
 
 /*
