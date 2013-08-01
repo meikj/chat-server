@@ -13,7 +13,7 @@
 #include "server.h"
 #include "clients.h"
 
-#define DEFAULT_PORT "5000"
+#define DEFAULT_PORT "27015"
 #define BUF_SIZE 256
 
 // Debug use
@@ -39,10 +39,10 @@ void list_clients() {
  */
 void handle_client(int s, struct sockaddr_in addr) {
 	char buf[BUF_SIZE];
+	char ip[INET_ADDRSTRLEN];
 	int res;
-	client c;
 	int c_id;
-	char *ip;
+	client c;
 
 	// Populate the client structure using the socket and address details
 	memset(&c, 0, sizeof c);
@@ -53,7 +53,7 @@ void handle_client(int s, struct sockaddr_in addr) {
 		return;
 	}
 
-	ip = clients_get_ip(c_id);
+	clients_get_ip(c_id, ip, INET_ADDRSTRLEN);
 	log_info("Client(id:%d): connected from %s\n", c_id, ip);
 
 	do {
@@ -71,7 +71,6 @@ void handle_client(int s, struct sockaddr_in addr) {
 
 	// Clean up client
 	clients_remove(c_id);
-	free(ip);
 }
 
 /*
