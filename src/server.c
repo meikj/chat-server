@@ -72,7 +72,7 @@ int server_init_addr(char *port) {
 	struct addrinfo hints;
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET; // IPv4
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
@@ -93,10 +93,33 @@ int server_init_addr(char *port) {
  */
 int server_init_socket() {
 	struct addrinfo *p;
+	struct sockaddr_in *ipv4;
+	struct sockaddr_in6 *ipv6;
+
+	char host_ip[INET6_ADDRSTRLEN];
 
 	for(p = serverinfo; p != NULL; p = p->ai_next) {
-		log_info("server_init_socket(): Attempting socket creation...\n",
-			NULL);
+		// Get IP of socket creation attempt
+		switch(p->ai_family) {
+			case AF_INET:
+			//IPV4
+			ipv4 = (struct sockaddr_in *)p->ai_addr;
+			inet_ntop(AF_INET, &(ipv4->sin_addr), host_ip, INET_ADDRSTRLEN);
+			break;
+
+			case AF_INET6:
+			//IPV6
+			ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+			inet_ntop(AF_INET6, &(ipv6->sin6_addr), host_ip, INET6_ADDRSTRLEN);
+			break;
+
+			default:
+			log_error("server_init_socket(): unsupported family\n", NULL);
+			return -1;
+		}
+
+		log_info("Attempting socket creation on %s ...\n",
+			host_ip);
 		if((serverfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == INVALID_SOCKET) {
 			// Some error occured with socket()
 			log_error("server_init_socket(): socket() failed: %d\n",
@@ -125,8 +148,7 @@ int server_init_socket() {
 
 	if(p == NULL) {
 		// If we reach this point when p is NULL, then address is invalid
-		log_error("server_init_socket(): servinfo contains no valid address\n",
-			NULL);
+		log_error("server_init_socket(): no valid address found\n", NULL);
 		return -1;
 	}
 
