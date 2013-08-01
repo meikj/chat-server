@@ -18,6 +18,6 @@ client *clients_get(const unsigned id);
 int clients_add(client *c);
 int clients_remove(const unsigned id);
 client **clients_list();
-char *clients_get_ip(const unsigned id);
+char *clients_get_ip(const unsigned id, char *dst, size_t size);
 
 #endif

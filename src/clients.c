@@ -121,10 +121,16 @@ client **clients_list() {
 
 /*
  * Fetch the IP address of a client.
+ *
+ * Params:
+ *	id = The client ID
+ *	dst = The location in which to store the IP address string
+ *	size = The size of the location
+ *
+ * Returns:
+ *	If the function was successful, then dst is returned, otherwise NULL.
  */
-char *clients_get_ip(const unsigned id) {
-	char *ip;
-
+char *clients_get_ip(const unsigned id, char *dst, size_t size) {
 	if(id < 1 || id > MAX_CLIENTS) {
 		log_error("clients_get_ip(): invalid id passed: %d\n", id);
 		return NULL;
@@ -133,7 +139,6 @@ char *clients_get_ip(const unsigned id) {
 		return NULL;
 	}
 
-	ip = (char *)malloc(INET_ADDRSTRLEN);
-	inet_ntop(AF_INET, &(clients[id]->addr.sin_addr), ip, INET_ADDRSTRLEN);
-	return ip;
+	inet_ntop(AF_INET, &(clients[id]->addr.sin_addr), dst, size);
+	return dst;
 }
