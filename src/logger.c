@@ -38,7 +38,7 @@ void log_entry(int level, const char *format, ...) {
 			break;
 		case LOGGER_WARNING:
 			if(LOGGER_LEVEL <= LOGGER_WARNING)
-				_print_entry("WARNING", buffer);
+				_print_entry("WARN", buffer);
 			break;
 		case LOGGER_ERROR:
 			if(LOGGER_LEVEL <= LOGGER_ERROR)
@@ -65,7 +65,7 @@ void _print_entry(const char *prefix, const char *message) {
 	if(prefix == NULL)
 		printf("%s", message);
 	else
-		printf("[%s]: %s", prefix, message);
+		printf("[%5s]: %s", prefix, message);
 }
 
 /*

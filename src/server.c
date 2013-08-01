@@ -49,9 +49,6 @@ int server_init() {
  * Clean up server resources.
  */
 void server_cleanup() {
-	if(serverinfo != NULL)
-		freeaddrinfo(serverinfo);
-
 	close(serverfd);
 #ifdef _WIN32
 	WSACleanup();
@@ -145,6 +142,8 @@ int server_init_socket() {
 		// If we reach this point then socket creation was a success
 		break;
 	}
+
+	freeaddrinfo(serverinfo);
 
 	if(p == NULL) {
 		// If we reach this point when p is NULL, then address is invalid
